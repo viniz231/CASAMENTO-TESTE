@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convite de Casamento - Kleberson & Sumaira</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    .font-script {
+      font-family: 'Alex Brush', cursive;
+    }
+    .font-serif-header {
+      font-family: 'Cinzel', serif;
+    }
+    .font-serif-body {
+      font-family: 'Cormorant Garamond', serif;
+    }
+    .font-sans-body {
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    /* Envelope & Paper Texture background */
+    .bg-paper {
+      background-color: #f7f4ee;
+      background-image: radial-gradient(#e4ded0 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+
+    /* 3D Envelope Perspective */
+    .perspective-1000 {
+      perspective: 1200px;
+    }
+
+    .envelope-wrapper {
+      position: relative;
+      transition: transform 0.8s ease-in-out;
+    }
+
+    /* Envelope Flaps Styling */
+    .flap-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 55%;
+      background: linear-gradient(175deg, #f3eee6 0%, #e6ddce 100%);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      transform-origin: top center;
+      transition: transform 1.1s cubic-bezier(0.4, 0, 0.2, 1), z-index 0.2s 0.5s;
+      z-index: 25;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      border-top: 1px solid #dfd5c5;
+    }
+
+    .flap-left {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 52%;
+      height: 100%;
+      background: linear-gradient(135deg, #eee8dc 0%, #e1d6c4 100%);
+      clip-path: polygon(0 0, 100% 50%, 0 100%);
+      z-index: 20;
+    }
+
+    .flap-right {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 52%;
+      height: 100%;
+      background: linear-gradient(-135deg, #eae3d7 0%, #ddd2bf 100%);
+      clip-path: polygon(100% 0, 0 50%, 100% 100%);
+      z-index: 20;
+    }
+
+    .flap-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 55%;
+      background: linear-gradient(0deg, #e4dacb 0%, #eae2d5 100%);
+      clip-path: polygon(0 100%, 100% 100%, 50% 0);
+      z-index: 15;
+    }
+
+    /* Wax Seal */
+    .wax-seal {
+      width: 86px;
+      height: 86px;
+      background: radial-gradient(circle at 35% 35%, #e8be6b 0%, #c4963a 50%, #8c6318 100%);
+      border-radius: 50%;
+      box-shadow: 
+        0 4px 12px rgba(0,0,0,0.3),
+        inset 0 2px 4px rgba(255,255,255,0.4),
+        inset 0 -3px 6px rgba(0,0,0,0.4);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -40%);
+      z-index: 30;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.6s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wax-seal:hover {
+      transform: translate(-50%, -40%) scale(1.06);
+      box-shadow: 
+        0 6px 18px rgba(196, 150, 58, 0.5),
+        inset 0 2px 4px rgba(255,255,255,0.5),
+        inset 0 -3px 6px rgba(0,0,0,0.4);
+    }
+
+    .wax-seal-inner {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 2px dashed #7a5410;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.25);
+    }
+
+    /* Opened state CSS logic */
+    .envelope-container.open .flap-top {
+      transform: rotateX(180deg);
+      z-index: 5;
+    }
+
+    .envelope-container.open .wax-seal {
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -40%) scale(1.3);
+    }
+
+    .envelope-container.open .invitation-card {
+      transform: translateY(-8%) scale(1.02);
+      z-index: 40;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+    /* Floating petals animation */
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.8; }
+      90% { opacity: 0.8; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+
+    .petal {
+      position: fixed;
+      top: -10px;
+      background: linear-gradient(135deg, #fce7f3, #ebd5ff);
+      border-radius: 15px 0 15px 0;
+      pointer-events: none;
+      z-index: 50;
+      animation: float 10s linear infinite;
+    }
+
+    /* Text Purple Shade from image */
+    .text-purple-invitation {
+      color: #9368b7;
+    }
+    
+    .text-gold-invitation {
+      color: #a38242;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c4b5fd;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-paper min-h-screen text-gray-800 flex flex-col items-center justify-between p-3 sm:p-6 overflow-x-hidden font-sans-body">
+
+  <!-- Top Bar / Controls -->
+  <header class="w-full max-w-4xl flex justify-between items-center py-2 px-4 z-50">
+    <div class="flex items-center space-x-2">
+      <span class="font-serif-header text-sm text-purple-900 font-semibold tracking-wider">K & S</span>
+      <span class="text-xs text-gray-400">| 11.11.2026</span>
+    </div>
+    
+    <div class="flex items-center space-x-3">
+      <!-- Audio Toggle Button -->
+      <button id="audioBtn" class="flex items-center space-x-2 bg-white/80 backdrop-blur border border-purple-200 text-purple-800 px-3 py-1.5 rounded-full text-xs hover:bg-purple-50 transition shadow-sm" title="Música de fundo">
+        <i id="audioIcon" class="fas fa-music text-purple-600"></i>
+        <span id="audioText" class="hidden sm:inline">Música</span>
+      </button>
+
+      <!-- Share Button -->
+      <button id="shareBtn" onclick="copyLink()" class="flex items-center space-x-1.5 bg-white/80 backdrop-blur border border-purple-200 text-purple-800 px-3 py-1.5 rounded-full text-xs hover:bg-purple-50 transition shadow-sm">
+        <i class="fas fa-share-alt text-purple-600"></i>
+        <span class="hidden sm:inline">Compartilhar</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="w-full max-w-5xl my-auto flex flex-col items-center justify-center relative py-4">
+    
+    <!-- Instruction Banner -->
+    <div id="instruction" class="mb-4 text-center transition-opacity duration-500">
+      <p class="text-purple-800 font-serif-header text-xs sm:text-sm tracking-widest uppercase flex items-center justify-center gap-2">
+        <i class="fas fa-hand-pointer animate-bounce text-amber-600"></i>
+        Clique no selo dourado para abrir o convite
+      </p>
+    </div>
+
+    <!-- Envelope Wrapper -->
+    <div id="envelopeContainer" class="envelope-container relative w-full max-w-3xl perspective-1000 flex justify-center">
+      
+      <!-- ENVELOPE BASE -->
+      <div class="relative w-full max-w-[680px] h-[420px] sm:h-[480px] bg-stone-200 rounded-lg shadow-2xl border border-stone-300 flex items-center justify-center overflow-visible">
+        
+        <!-- Flap Top (Animated) -->
+        <div class="flap-top"></div>
+        <!-- Flap Left -->
+        <div class="flap-left"></div>
+        <!-- Flap Right -->
+        <div class="flap-right"></div>
+        <!-- Flap Bottom -->
+        <div class="flap-bottom"></div>
+
+        <!-- Gold Wax Seal -->
+        <div id="waxSeal" class="wax-seal" onclick="openEnvelope()">
+          <div class="wax-seal-inner">
+            <span class="font-serif-header text-2xl font-bold text-amber-100 tracking-tighter" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.6);">
+              KS
+            </span>
+          </div>
+        </div>
+
+        <!-- THE INVITATION CARD (Revealed inside/above envelope) -->
+        <div id="invitationCard" class="invitation-card absolute top-2 w-[95%] sm:w-[94%] h-[95%] bg-[#FAF8F5] rounded-md shadow-lg border border-amber-100/60 transition-all duration-1000 ease-in-out z-10 overflow-y-auto overflow-x-hidden p-4 sm:p-6 md:p-8 flex flex-col justify-between">
+          
+          <!-- Card Interior Grid (Matches Image Layout) -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center h-full">
+            
+            <!-- LEFT COLUMN: Text Content -->
+            <div class="md:col-span-7 flex flex-col justify-between space-y-4 text-left pr-0 md:pr-2">
+              
+              <!-- Bible Verse -->
+              <div class="space-y-1">
+                <p class="text-purple-invitation font-serif-body text-[11px] sm:text-xs md:text-sm tracking-wider uppercase font-semibold leading-relaxed">
+                  "O AMOR É PACIENTE, O AMOR É BONDOSO. NÃO INVEJA, NÃO SE VANGLÓRIA, NÃO SE ORGULHA."
+                </p>
+                <p class="text-purple-invitation font-serif-body text-[10px] sm:text-xs font-medium tracking-widest">
+                  1 CORÍNTIOS 13:4
+                </p>
+              </div>
+
+              <!-- Couples Names -->
+              <div class="my-2 sm:my-4">
+                <h1 class="font-script text-purple-invitation text-4xl sm:text-5xl md:text-6xl leading-tight">
+                  Kleberson <br class="hidden sm:inline" />& Sumaira
+                </h1>
+              </div>
+
+              <!-- Date & Time -->
+              <div class="space-y-1 border-t border-b border-purple-100 py-3">
+                <div class="flex items-center text-gold-invitation font-serif-header text-sm sm:text-base md:text-lg tracking-widest font-semibold">
+                  <span>11</span>
+                  <span class="mx-2 text-xs">|</span>
+                  <span>NOVEMBRO</span>
+                  <span class="mx-2 text-xs">|</span>
+                  <span>2026</span>
+                </div>
+                <p class="text-gold-invitation font-serif-header text-xs tracking-wider font-medium">
+                  DOMINGO 19:00H
+                </p>
+              </div>
+
+              <!-- Address Location -->
+              <div class="text-xs sm:text-sm text-amber-900/80 font-sans-body space-y-0.5 leading-relaxed">
+                <p class="font-medium">Rua Enéas Marques, 605</p>
+                <p>Cidade Jardim, São José Dos Pinhais - PR</p>
+                <p class="text-xs text-stone-500">83035-300 Brasil</p>
+              </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Watercolor Illustration -->
+            <div class="md:col-span-5 flex flex-col items-center justify-center relative min-h-[220px] md:min-h-[300px]">
+              
+              <!-- Custom SVG Watercolor Wedding Arch Illustration -->
+              <div class="w-full h-full flex items-center justify-center relative">
+                <svg viewBox="0 0 300 360" class="w-full h-auto max-h-[300px] drop-shadow-md">
+                  <defs>
+                    <linearGradient id="archGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#4a6b47" />
+                      <stop offset="50%" stop-color="#2d4a2b" />
+                      <stop offset="100%" stop-color="#1e331c" />
+                    </linearGradient>
+                    <filter id="watercolor">
+                      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+                      <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
+                    </filter>
+                  </defs>
+
+                  <!-- Floral Arch Background -->
+                  <g filter="url(#watercolor)">
+                    <!-- Arch Pillars & Leaves -->
+                    <path d="M 40,320 Q 40,60 150,50 Q 260,60 260,320" fill="none" stroke="url(#archGrad)" stroke-width="28" stroke-linecap="round" />
+                    
+                    <!-- Watercolor Leaf Blobs -->
+                    <circle cx="60" cy="120" r="35" fill="#5b8256" opacity="0.7" />
+                    <circle cx="90" cy="70" r="40" fill="#43633e" opacity="0.8" />
+                    <circle cx="150" cy="45" r="45" fill="#688f62" opacity="0.7" />
+                    <circle cx="210" cy="70" r="40" fill="#3c5938" opacity="0.8" />
+                    <circle cx="240" cy="120" r="35" fill="#587a53" opacity="0.7" />
+                    
+                    <!-- Soft Flowers on Arch -->
+                    <circle cx="70" cy="100" r="10" fill="#ffffff" opacity="0.9" />
+                    <circle cx="130" cy="40" r="12" fill="#ffffff" opacity="0.9" />
+                    <circle cx="170" cy="42" r="10" fill="#fbcfe8" opacity="0.9" />
+                    <circle cx="230" cy="100" r="11" fill="#ffffff" opacity="0.9" />
+                    <circle cx="85" cy="140" r="8" fill="#f5d0fe" opacity="0.8" />
+                    <circle cx="215" cy="140" r="8" fill="#ffffff" opacity="0.8" />
+
+                    <!-- Base Garden Flowers -->
+                    <ellipse cx="60" cy="310" rx="35" ry="15" fill="#4d7048" opacity="0.8" />
+                    <ellipse cx="240" cy="310" rx="35" ry="15" fill="#4d7048" opacity="0.8" />
+                    <circle cx="50" cy="305" r="6" fill="#ffffff" />
+                    <circle cx="70" cy="308" r="5" fill="#e9d5ff" />
+                    <circle cx="230" cy="308" r="6" fill="#ffffff" />
+                    <circle cx="250" cy="305" r="5" fill="#fbcfe8" />
+                  </g>
+
+                  <!-- Bride and Groom Silhouettes (Watercolor Style) -->
+                  <!-- Groom -->
+                  <path d="M 130,290 C 130,220 135,180 142,160 C 147,150 155,150 158,160 C 160,180 162,220 160,290 Z" fill="#292d32" />
+                  <circle cx="150" cy="142" r="10" fill="#3d2a1d" /> <!-- Head -->
+                  
+                  <!-- Bride -->
+                  <!-- Dress -->
+                  <path d="M 152,290 C 150,220 156,180 162,170 C 165,180 185,240 220,295 Z" fill="#fcfbf7" />
+                  <path d="M 155,290 C 153,230 162,190 165,175 C 170,190 195,250 225,295 Z" fill="#eae7dc" opacity="0.5" />
+                  <!-- Bride Hair/Head -->
+                  <circle cx="163" cy="145" r="8" fill="#1c1917" />
+                  <!-- Veil -->
+                  <path d="M 163,142 Q 185,160 195,230" fill="none" stroke="#ffffff" stroke-width="3" opacity="0.7" stroke-dasharray="2,2" />
+                  
+                  <!-- Kiss/Embrace Gesture -->
+                  <path d="M 148,168 Q 158,172 163,170" fill="none" stroke="#292d32" stroke-width="4" stroke-linecap="round" />
+                  
+                  <!-- Stone Stairs Base -->
+                  <rect x="20" y="315" width="260" height="12" rx="4" fill="#d6cebf" opacity="0.8" />
+                  <rect x="10" y="327" width="280" height="15" rx="4" fill="#c7bfae" opacity="0.9" />
+                </svg>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Action Buttons (Visible after opening) -->
+    <div id="actionButtons" class="mt-8 flex flex-wrap justify-center gap-4 opacity-0 transition-opacity duration-1000 transform translate-y-4">
+      
+      <!-- Confirm Presence (RSVP) Button -->
+      <button onclick="openRsvpModal()" class="flex items-center space-x-2 bg-purple-900 hover:bg-purple-950 text-white px-6 py-3 rounded-full font-sans-body text-xs sm:text-sm tracking-wider uppercase transition shadow-md hover:shadow-lg">
+        <i class="fas fa-check-circle text-amber-300"></i>
+        <span>Confirmar Presença</span>
+      </button>
+
+      <!-- Google Maps Link -->
+      <a href="https://maps.google.com/?q=Rua+Eneas+Marques+605+Cidade+Jardim+Sao+Jose+dos+Pinhais+PR" target="_blank" class="flex items-center space-x-2 bg-amber-700 hover:bg-amber-800 text-white px-6 py-3 rounded-full font-sans-body text-xs sm:text-sm tracking-wider uppercase transition shadow-md hover:shadow-lg">
+        <i class="fas fa-map-marker-alt text-amber-200"></i>
+        <span>Ver No Mapa</span>
+      </a>
+
+    </div>
+
+  </main>
+
+  <!-- RSVP Modal -->
+  <div id="rsvpModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative transform transition-all">
+      <button onclick="closeRsvpModal()" class="absolute top-4 right-4 text-stone-400 hover:text-stone-700">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <h3 class="font-serif-header text-xl text-purple-950 font-bold">Confirmação de Presença</h3>
+        <p class="text-xs text-stone-500 mt-1">Por favor, confirme até 20 de Outubro de 2026</p>
+      </div>
+
+      <form id="rsvpForm" onsubmit="submitRSVP(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 uppercase tracking-wider mb-1">Nome Completo</label>
+          <input type="text" required placeholder="Seu nome" class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 uppercase tracking-wider mb-1">Você irá comparecer?</label>
+          <select required class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none text-sm">
+            <option value="sim">Sim, com certeza!</option>
+            <option value="nao">Infelizmente não poderei</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 uppercase tracking-wider mb-1">Número de Acompanhantes</label>
+          <input type="number" min="0" max="5" value="0" class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 uppercase tracking-wider mb-1">Mensagem aos noivos (opcional)</label>
+          <textarea rows="3" placeholder="Deixe um carinho para nós..." class="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:ring-2 focus:ring-purple-600 focus:border-transparent outline-none text-sm"></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-purple-900 hover:bg-purple-950 text-white font-medium py-3 rounded-lg text-sm tracking-wider uppercase transition shadow-md">
+          Enviar Confirmação
+        </button>
+      </form>
+
+      <!-- Feedback Msg -->
+      <div id="rsvpSuccess" class="hidden text-center py-8 space-y-3">
+        <i class="fas fa-heart text-4xl text-purple-600 animate-bounce"></i>
+        <h4 class="font-serif-header text-lg text-purple-950 font-bold">Obrigado por responder!</h4>
+        <p class="text-sm text-stone-600">Sua resposta foi registrada com sucesso. Esperamos você no nosso grande dia!</p>
+        <button onclick="closeRsvpModal()" class="mt-4 px-6 py-2 bg-stone-200 text-stone-800 rounded-full text-xs uppercase tracking-wider">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-stone-900 text-white text-xs px-4 py-3 rounded-xl shadow-xl z-50 hidden transition-all duration-300 flex items-center space-x-2">
+    <i class="fas fa-info-circle text-amber-400"></i>
+    <span id="toastMsg">Mensagem</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w-full text-center py-3 text-[11px] text-stone-400 font-sans-body">
+    Kleberson & Sumaira • 2026
+  </footer>
+
+  <script>
+    // Audio Synth Web Audio API (Soft Gentle Romantic Chords)
+    let audioCtx = null;
+    let isPlaying = false;
+    let synthInterval = null;
+
+    function playSoftBackgroundMusic() {
+      if (isPlaying) return;
+      
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!audioCtx) {
+        audioCtx = new AudioContext();
+      }
+
+      isPlaying = true;
+      document.getElementById('audioIcon').className = 'fas fa-volume-up text-purple-600 animate-pulse';
+      document.getElementById('audioText').innerText = 'Tocando';
+
+      // Romantic Pad Frequencies (Soft A Major / F#m chords)
+      const notes = [220.00, 277.18, 329.63, 440.00, 554.37]; // A, C#, E, A, C#
+      let noteIdx = 0;
+
+      synthInterval = setInterval(() => {
+        if (!isPlaying || !audioCtx) return;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(notes[noteIdx % notes.length], audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.04, audioCtx.currentTime + 1.5);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 4.5);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 4.6);
+
+        noteIdx++;
+      }, 2500);
+    }
+
+    function stopMusic() {
+      isPlaying = false;
+      if (synthInterval) clearInterval(synthInterval);
+      document.getElementById('audioIcon').className = 'fas fa-music text-purple-600';
+      document.getElementById('audioText').innerText = 'Música';
+    }
+
+    document.getElementById('audioBtn').addEventListener('click', () => {
+      if (isPlaying) {
+        stopMusic();
+      } else {
+        playSoftBackgroundMusic();
+      }
+    });
+
+    // Envelope Interactive Unfolding
+    function openEnvelope() {
+      const container = document.getElementById('envelopeContainer');
+      const instruction = document.getElementById('instruction');
+      const actionButtons = document.getElementById('actionButtons');
+
+      // Add Open Class to Trigger CSS Transformations
+      container.classList.add('open');
+
+      // Hide click instruction
+      instruction.style.opacity = '0';
+      setTimeout(() => instruction.classList.add('hidden'), 500);
+
+      // Show Action Buttons with delay
+      setTimeout(() => {
+        actionButtons.classList.remove('opacity-0', 'translate-y-4');
+        actionButtons.classList.add('opacity-100', 'translate-y-0');
+      }, 900);
+
+      // Start floating petals
+      createPetals();
+
+      // Start music automatically on click if not playing
+      if (!isPlaying) {
+        playSoftBackgroundMusic();
+      }
+    }
+
+    // Generate falling rose petals
+    function createPetals() {
+      for (let i = 0; i < 15; i++) {
+        setTimeout(() => {
+          const petal = document.createElement('div');
+          petal.className = 'petal';
+          petal.style.left = Math.random() * 100 + 'vw';
+          petal.style.width = (Math.random() * 12 + 10) + 'px';
+          petal.style.height = (Math.random() * 15 + 12) + 'px';
+          petal.style.animationDuration = (Math.random() * 5 + 7) + 's';
+          document.body.appendChild(petal);
+
+          setTimeout(() => petal.remove(), 12000);
+        }, i * 400);
+      }
+    }
+
+    // RSVP Modal Handlers
+    function openRsvpModal() {
+      document.getElementById('rsvpModal').classList.remove('hidden');
+    }
+
+    function closeRsvpModal() {
+      document.getElementById('rsvpModal').classList.add('hidden');
+    }
+
+    function submitRSVP(e) {
+      e.preventDefault();
+      document.getElementById('rsvpForm').classList.add('hidden');
+      document.getElementById('rsvpSuccess').classList.remove('hidden');
+    }
+
+    // Clipboard Copy Link
+    function copyLink() {
+      const dummy = document.createElement('input');
+      document.body.appendChild(dummy);
+      dummy.value = window.location.href;
+      dummy.select();
+      document.execCommand('copy');
+      document.body.removeChild(dummy);
+
+      showToast('Link do convite copiado para a área de transferência!');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.innerText = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
