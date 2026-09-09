@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convite de Casamento - Kleberson & Sumaira</title>
+  
+  <!-- Fontes do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #2b2728;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Cormorant Garamond', serif;
+      overflow-x: hidden;
+      padding: 20px 10px;
+    }
+
+    /* Container Principal */
+    .wedding-wrapper {
+      perspective: 1000px;
+      width: 100%;
+      max-width: 650px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Envelope */
+    .envelope-card {
+      width: 100%;
+      background: #f4f0e8;
+      background-image: radial-gradient(#e3ded3 1px, transparent 1px);
+      background-size: 20px 20px;
+      border-radius: 8px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.6s ease, opacity 0.6s ease;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 420px;
+      border: 1px solid #dcd4c7;
+    }
+
+    /* Linhas do Envelope */
+    .envelope-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        linear-gradient(135deg, transparent 49.5%, #c8c0b2 50%, #dcd4c7 50.5%, transparent 51%),
+        linear-gradient(225deg, transparent 49.5%, #c8c0b2 50%, #dcd4c7 50.5%, transparent 51%);
+      background-size: 100% 100%;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    /* Lacre de Cera Dourado */
+    .wax-seal {
+      width: 110px;
+      height: 110px;
+      background: radial-gradient(circle at 35% 35%, #f1d582 0%, #d4af37 40%, #aa820a 85%, #735500 100%);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 
+        0 6px 15px rgba(0,0,0,0.35),
+        inset 0 3px 6px rgba(255,255,255,0.6),
+        inset 0 -4px 8px rgba(0,0,0,0.4);
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 2px solid #e2c058;
+    }
+
+    .envelope-card:hover .wax-seal {
+      transform: scale(1.06);
+      box-shadow: 
+        0 10px 20px rgba(0,0,0,0.4),
+        inset 0 3px 6px rgba(255,255,255,0.7),
+        inset 0 -4px 8px rgba(0,0,0,0.4);
+    }
+
+    /* Borda irregular de cera derretida */
+    .wax-seal::after {
+      content: "";
+      position: absolute;
+      top: -6px; left: -6px; right: -6px; bottom: -6px;
+      border-radius: 43% 57% 50% 50% / 45% 52% 48% 55%;
+      border: 3px solid rgba(212, 175, 55, 0.5);
+      pointer-events: none;
+    }
+
+    .wax-seal-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 42px;
+      font-weight: 600;
+      color: #7b5993;
+      text-shadow: -1px -1px 0px rgba(255,255,255,0.4), 1px 1px 1px rgba(0,0,0,0.3);
+      letter-spacing: 2px;
+      user-select: none;
+    }
+
+    .tap-hint {
+      position: absolute;
+      bottom: 25px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      letter-spacing: 2px;
+      color: #8c8275;
+      text-transform: uppercase;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-4px); }
+    }
+
+    /* Cartão do Convite (Escondido inicialmente) */
+    .invitation-card {
+      display: none;
+      width: 100%;
+      background: #fcfbfa;
+      border-radius: 6px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+      padding: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid #eae5dc;
+    }
+
+    .invitation-card.active {
+      display: flex;
+      flex-direction: column;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Grade Interna do Convite */
+    .invitation-grid {
+      display: flex;
+      flex-direction: row;
+      min-height: 480px;
+    }
+
+    @media (max-width: 600px) {
+      .invitation-grid {
+        flex-direction: column-reverse;
+      }
+    }
+
+    /* Lado Esquerdo - Textos */
+    .invitation-left {
+      flex: 1.1;
+      padding: 35px 25px 30px 35px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-color: #faf8f5;
+    }
+
+    .verse {
+      color: #8352a5;
+      font-size: 13px;
+      line-height: 1.4;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 25px;
+    }
+
+    .couples-names {
+      margin: 15px 0 25px 0;
+    }
+
+    .name {
+      font-family: 'Alex Brush', cursive;
+      font-size: 58px;
+      color: #9d71bc;
+      line-height: 0.9;
+      display: block;
+    }
+
+    .name.groom {
+      margin-left: 0;
+    }
+
+    .name.bride {
+      margin-left: 35px;
+    }
+
+    .details {
+      margin-top: 20px;
+      border-top: 1px solid #e8e1d5;
+      padding-top: 15px;
+    }
+
+    .date-row {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      color: #7a7368;
+      font-weight: 500;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .date-highlight {
+      font-size: 16px;
+      font-weight: 600;
+      color: #4a443c;
+    }
+
+    .time-row {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: #8c857b;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .address {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      line-height: 1.5;
+      color: #8c857b;
+    }
+
+    /* Lado Direito - Ilustração Aquarela */
+    .invitation-right {
+      flex: 0.9;
+      background: #f4f0ea;
+      position: relative;
+      overflow: hidden;
+      min-height: 250px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    /* Ilustração em Vetor/Aquarela */
+    .illustration-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    /* Botões de Ação Inferiores */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      padding: 15px 25px;
+      background-color: #f1ebd8;
+      border-top: 1px solid #e3dccb;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: 1px solid #8352a5;
+      background: transparent;
+      color: #8352a5;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .btn:hover {
+      background: #8352a5;
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(131, 82, 165, 0.3);
+    }
+
+    .btn-primary {
+      background: #8352a5;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #6c3f8c;
+    }
+
+    /* Modal RSVP */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .modal-content h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      color: #8352a5;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .close-modal {
+      background: #ccc;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wedding-wrapper">
+
+    <!-- ENVELOPE (VISÍVEL NO INÍCIO) -->
+    <div class="envelope-card" id="envelope" onclick="openInvitation()">
+      <div class="wax-seal">
+        <span class="wax-seal-text">KS</span>
+      </div>
+      <div class="tap-hint">Clique para abrir o convite</div>
+    </div>
+
+    <!-- CONVITE ABERTO -->
+    <div class="invitation-card" id="invitation">
+      <div class="invitation-grid">
+        
+        <!-- LADO ESQUERDO: TEXTOS -->
+        <div class="invitation-left">
+          <div>
+            <div class="verse">
+              O AMOR É PACIENTE, O AMOR É BONDOSO. NÃO INVEJA, NÃO SE VANGLORIA, NÃO SE ORGULHA.<br>
+              <small style="font-size: 11px; opacity: 0.8;">1 CORÍNTIOS 13:4</small>
+            </div>
+
+            <div class="couples-names">
+              <span class="name groom">Kleberson</span>
+              <span class="name bride">Sumaira</span>
+            </div>
+          </div>
+
+          <div class="details">
+            <div class="date-row">
+              11 <span class="date-highlight">| NOVEMBRO |</span> 2026
+            </div>
+            <div class="time-row">
+              DOMINGO | 19:00H
+            </div>
+            <div class="address">
+              Rua Enéas Marques, 625<br>
+              Cidade Jardim, São José dos Pinhais - PR<br>
+              83035-300 Brasil
+            </div>
+          </div>
+        </div>
+
+        <!-- LADO DIREITO: ILUSTRAÇÃO AQUARELA -->
+        <div class="invitation-right">
+          <svg class="illustration-container" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <filter id="watercolor" x="-10%" y="-10%" width="120%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+            </defs>
+
+            <!-- Fundo em aquarela suave -->
+            <rect width="100%" height="100%" fill="#f2ede4" />
+
+            <!-- Arco de Folhagem (Estilo Aquarela) -->
+            <g filter="url(#watercolor)">
+              <!-- Folhas e Galhos -->
+              <path d="M 30,380 C 20,200 80,50 150,50 C 220,50 280,200 270,380" fill="none" stroke="#4a6b48" stroke-width="25" opacity="0.3" stroke-linecap="round" />
+              <path d="M 20,380 C 10,180 70,40 150,40 C 230,40 290,180 280,380" fill="none" stroke="#2d482d" stroke-width="12" opacity="0.5" stroke-linecap="round" />
+              <path d="M 40,380 C 30,220 90,70 150,70 C 210,70 270,220 260,380" fill="none" stroke="#6b8c66" stroke-width="15" opacity="0.4" stroke-linecap="round" />
+              
+              <!-- Flores/Destaques em tom lilás/rosa -->
+              <circle cx="70" cy="160" r="12" fill="#a882c1" opacity="0.6" />
+              <circle cx="230" cy="160" r="12" fill="#a882c1" opacity="0.6" />
+              <circle cx="110" cy="80" r="10" fill="#c4a5d8" opacity="0.7" />
+              <circle cx="190" cy="80" r="10" fill="#c4a5d8" opacity="0.7" />
+              <circle cx="150" cy="55" r="14" fill="#a882c1" opacity="0.6" />
+            </g>
+
+            <!-- Portão/Graal ao Fundo -->
+            <path d="M 120,380 L 120,280 Q 150,260 180,280 L 180,380" fill="none" stroke="#a39a8e" stroke-width="2" opacity="0.5" />
+            <line x1="135" y1="270" x2="135" y2="380" stroke="#a39a8e" stroke-width="1.5" opacity="0.4" />
+            <line x1="165" y1="270" x2="165" y2="380" stroke="#a39a8e" stroke-width="1.5" opacity="0.4" />
+
+            <!-- Silhueta dos Noivos -->
+            <g transform="translate(130, 220)">
+              <!-- Noiva (Vestido Branco) -->
+              <path d="M 25,130 Q 10,80 28,50 Q 32,35 30,25 Q 26,18 32,12 Q 38,18 35,25 Q 36,35 40,50 Q 55,80 50,130 Z" fill="#ffffff" opacity="0.95" />
+              <!-- Véu da Noiva -->
+              <path d="M 32,12 Q 10,40 5,120 Q 25,100 30,50 Z" fill="#ffffff" opacity="0.5" />
+              
+              <!-- Noivo (Terno Escuro) -->
+              <path d="M 40,130 L 42,52 Q 43,35 48,22 Q 52,12 56,12 Q 60,12 62,20 Q 60,35 60,52 L 62,130 Z" fill="#2c302e" />
+              
+              <!-- Cabeça do Noivo -->
+              <circle cx="56" cy="10" r="5" fill="#3a2e2b" />
+              <!-- Cabeça da Noiva -->
+              <circle cx="33" cy="14" r="4.5" fill="#5c433c" />
+
+              <!-- Detalhes noivos abraçados -->
+              <path d="M 35,32 Q 45,35 50,32" stroke="#2c302e" stroke-width="2" fill="none" />
+            </g>
+          </svg>
+        </div>
+
+      </div>
+
+      <!-- BOTÕES DE AÇÃO -->
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="openModal()">Confirmar Presença</button>
+        <a class="btn" href="https://maps.google.com/?q=Rua+Eneas+Marques,+625,+Cidade+Jardim,+Sao+Jose+dos+Pinhais+-+PR" target="_blank">Ver no Mapa</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL RSVP -->
+  <div class="modal" id="rsvpModal">
+    <div class="modal-content">
+      <h3>Confirmar Presença</h3>
+      <form onsubmit="submitRSVP(event)">
+        <div class="form-group">
+          <label for="name">Nome Completo</label>
+          <input type="text" id="name" required placeholder="Seu nome">
+        </div>
+        <div class="form-group">
+          <label for="status">Você comparecerá?</label>
+          <select id="status">
+            <option value="sim">Sim, com certeza!</option>
+            <option value="nao">Infelizmente não poderei</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="guests">Número de Acompanhantes</label>
+          <input type="number" id="guests" min="0" max="5" value="0">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Enviar Confirmação</button>
+        <button type="button" class="close-modal" onclick="closeModal()">Cancelar</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // DIGITE AQUI O NÚMERO DO WHATSAPP DOS NOIVOS (Com DDD, sem espaços ou traços)
+    // Exemplo: '5541999998888' (55 = Brasil, 41 = DDD)
+    const TELEFONE_NOIVOS = '41988395229';
+
+    function openInvitation() {
+      const envelope = document.getElementById('envelope');
+      const invitation = document.getElementById('invitation');
+
+      envelope.style.transform = 'scale(0.8) rotateX(-20deg)';
+      envelope.style.opacity = '0';
+
+      setTimeout(() => {
+        envelope.style.display = 'none';
+        invitation.classList.add('active');
+      }, 500);
+    }
+
+    function openModal() {
+      document.getElementById('rsvpModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('rsvpModal').style.display = 'none';
+    }
+
+    function submitRSVP(e) {
+      e.preventDefault();
+      
+      const nome = document.getElementById('name').value;
+      const status = document.getElementById('status').value;
+      const acompanhantes = document.getElementById('guests').value;
+
+      let mensagem = `Olá! Confirmando presença para o casamento de Kleberson & Sumaira:%0A%0A`;
+      mensagem += `*Nome:* ${nome}%0A`;
+      
+      if (status === 'sim') {
+        mensagem += `*Presença:* Confirmada! ✅%0A`;
+        mensagem += `*Acompanhantes:* ${acompanhantes}`;
+      } else {
+        mensagem += `*Presença:* Não poderei comparecer ❌`;
+      }
+
+      // Link oficial do WhatsApp API
+      const urlWhatsApp = `https://api.whatsapp.com/send?phone=${TELEFONE_NOIVOS}&text=${mensagem}`;
+      
+      // Abre o WhatsApp com a mensagem pronta
+      window.open(urlWhatsApp, '_blank');
+      
+      closeModal();
+    }
+  </script>
+</body>
+</html>
